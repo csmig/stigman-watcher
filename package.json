@@ -24,6 +24,7 @@
     "he": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
     "n-readlines": "^1.0.1",
+    "open": "^8.4.0",
     "prompt-sync": "4.1.6",
     "semver": "^7.3.5",
     "serialize-error": "^8.0.1",

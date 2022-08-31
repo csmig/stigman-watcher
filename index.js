@@ -76,6 +76,8 @@ async function hasMinApiVersion () {
 
 async function preflightServices () {
   await hasMinApiVersion()
+
+  await auth.getOpenIdConfiguration()
   await auth.getToken()
   logger.info({ component: 'main', message: `preflight token request suceeded`})
   const promises = [
