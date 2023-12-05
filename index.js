@@ -2,15 +2,18 @@
 
 const minApiVersion = '1.2.7'
 
-const { logger, getSymbol } = require('./lib/logger')
-const config = require('./lib/args')
-if (!config) {
+import { logger, getSymbol } from './lib/logger.js'
+import options from './lib/args.js'
+if (!options) {
   logger.end()
-  return
+  process.exit(1)
 }
-const auth = require('./lib/auth')
-const api = require('./lib/api')
-const {serializeError} = require('serialize-error')
+import { getOpenIDConfiguration, getToken } from './lib/auth.js'
+import { getDefinition, getCollection, getCollectionAssets, getInstalledStigs, getScapBenchmarkMap, getUser } from './lib/api.js'
+import { serializeError } from 'serialize-error'
+import { startFsEventWatcher } from './lib/events.js'
+import { startScanner } from './lib/scan.js'
+import semverGte from 'semver/functions/gte.js'
 
 run()
 
@@ -19,17 +22,15 @@ async function run() {
     logger.info({
       component: 'main',
       message: 'running',
-      config: getObfuscatedConfig(config)
+      config: getObfuscatedConfig(options)
     })
     
     await preflightServices()
-    if (config.mode === 'events') {
-      const watcher = require('./lib/events')
-      watcher.startFsEventWatcher()
+    if (options.mode === 'events') {
+      startFsEventWatcher()
     }
-    else if (config.mode === 'scan') {
-      const scanner = require('./lib/scan')
-      scanner.startScanner()
+    else if (options.mode === 'scan') {
+      startScanner()
     }
   }
   catch (e) {
@@ -63,8 +64,7 @@ function logError(e) {
 }
 
 async function hasMinApiVersion () {
-  const semverGte = require('semver/functions/gte')
-  const [remoteApiVersion] = await api.getDefinition('$.info.version')
+  const [remoteApiVersion] = await getDefinition('$.info.version')
   logger.info({ component: 'main', message: `preflight API version`, minApiVersion, remoteApiVersion})
   if (semverGte(remoteApiVersion, minApiVersion)) {
     return true
@@ -76,14 +76,14 @@ async function hasMinApiVersion () {
 
 async function preflightServices () {
   await hasMinApiVersion()
-  await auth.getOpenIDConfiguration()
-  await auth.getToken()
+  await getOpenIDConfiguration()
+  await getToken()
   logger.info({ component: 'main', message: `preflight token request suceeded`})
   const promises = [
-    api.getCollection(config.collectionId),
-    api.getCollectionAssets(config.collectionId),
-    api.getInstalledStigs(),
-    api.getScapBenchmarkMap()
+    getCollection(options.collectionId),
+    getCollectionAssets(options.collectionId),
+    getInstalledStigs(),
+    getScapBenchmarkMap()
   ]
   await Promise.all(promises)
   setInterval(refreshCollection, 10 * 60000)
@@ -91,7 +91,7 @@ async function preflightServices () {
   // OAuth scope 'stig-manager:user:read' was not required for early versions of Watcher
   // For now, fail gracefully if we are blocked from calling /user
   try {
-    await api.getUser()
+    await getUser()
     setInterval(refreshUser, 10 * 60000)
   }
   catch (e) {
@@ -110,7 +110,7 @@ function getObfuscatedConfig (config) {
 
 async function refreshUser() {
   try {
-    await api.getUser()
+    await getUser()
   }
   catch (e) {
     logError(e)
@@ -119,7 +119,7 @@ async function refreshUser() {
 
 async function refreshCollection() {
   try {
-    await api.getCollection(config.collectionId)
+    await getCollection(options.collectionId)
   }
   catch (e) {
     logError(e)

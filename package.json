@@ -6,11 +6,12 @@
   "bin": {
     "stigman-watcher": "./index.js"
   },
+  "type": "module",
   "author": "carl.a.smigielski@saic.com",
   "license": "MIT",
   "repository": "github:nuwcdivnpt/stigman-watcher",
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "dependencies": {
     "atob": "^2.1.2",
