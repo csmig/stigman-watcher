@@ -1,13 +1,7 @@
 #!/usr/bin/env node
 
-const minApiVersion = '1.2.7'
-
 import { logger, getSymbol } from './lib/logger.js'
 import options from './lib/args.js'
-if (!options) {
-  logger.end()
-  process.exit(1)
-}
 import { getOpenIDConfiguration, getToken } from './lib/auth.js'
 import { getDefinition, getCollection, getCollectionAssets, getInstalledStigs, getScapBenchmarkMap, getUser } from './lib/api.js'
 import { serializeError } from 'serialize-error'
@@ -15,28 +9,29 @@ import { startFsEventWatcher } from './lib/events.js'
 import { startScanner } from './lib/scan.js'
 import semverGte from 'semver/functions/gte.js'
 
-run()
-
-async function run() {
-  try {
-    logger.info({
-      component: 'main',
-      message: 'running',
-      config: getObfuscatedConfig(options)
-    })
-    
-    await preflightServices()
-    if (options.mode === 'events') {
-      startFsEventWatcher()
-    }
-    else if (options.mode === 'scan') {
-      startScanner()
-    }
+const minApiVersion = '1.2.7'
+try {
+  if (!options) {
+    logger.end()
+    process.exit(1)
   }
-  catch (e) {
-    logError(e)
-    await logger.end()
+  logger.info({
+    component: 'main',
+    message: 'running',
+    config: getObfuscatedConfig(options)
+  })
+  
+  await preflightServices()
+  if (options.mode === 'events') {
+    startFsEventWatcher()
   }
+  else if (options.mode === 'scan') {
+    startScanner()
+  }
+}
+catch (e) {
+  logError(e)
+  logger.end()
 }
 
 function logError(e) {
