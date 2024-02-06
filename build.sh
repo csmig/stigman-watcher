@@ -29,6 +29,9 @@ printf "[BUILD_TASK] Fetching node_modules\n"
 rm -rf ./node_modules
 npm ci
 
+# bundle
+npx esbuild index.js --bundle --platform=node --outfile=bundle.js
+
 # version=$(git describe --tags | sed 's/\(.*\)-.*/\1/')
 version=$(jq -r .version package.json)
 printf "\n[BUILD_TASK] Using version string: $version\n"

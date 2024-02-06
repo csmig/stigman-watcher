@@ -1,9 +1,9 @@
 {
     "name": "stigman-watcher",
-    "bin": "./index.js",
+    "bin": "./bundle.js",
     "pkg": {
         "targets": [ "node18-win", "node18-linuxstatic" ],
-        "assets": ["./node_modules/stig-manager-client-modules/index.cjs"],
+        "assets": ["./node_modules/better-queue-memory/**"],
         "outputPath": "./bin"
     }
 }
