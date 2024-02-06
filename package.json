@@ -33,5 +33,8 @@
     "serialize-error": "^8.0.1",
     "stig-manager-client-modules": "github:nuwcdivnpt/stig-manager-client-modules#semver:^1.0.0",
     "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
   }
 }
