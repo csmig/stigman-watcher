@@ -1,6 +1,6 @@
 {
     "imports": {
-      "stig-manager-client-modules": "file:///home/mathew/Documents/CodeWorkspace/stig-manager-client-modules/index.js"
+      "stig-manager-client-modules": "file:///home/csmig/dev/stig-manager-client-modules/index.js"
     }
   }
   
